@@ -1,6 +1,8 @@
 package com.edu.util;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -19,8 +21,12 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EmailUtil {
-	static String str = "<p>" + "	<br />"
+	private static Logger log = LoggerFactory.getLogger(EmailUtil.class);
+	private static String str = "<p>" + "	<br />"
 			+ "	<p style=\"font-family:&quot;Microsoft YaHei&quot;;white-space:normal;font-size:medium;\">"
 			+ "		<span style=\"font-size:14px;\">黄部长</span>" + "	</p>"
 			+ "	<p style=\"font-family:&quot;Microsoft YaHei&quot;;white-space:normal;font-size:14px;\">" + "		中午好"
@@ -34,54 +40,62 @@ public class EmailUtil {
 			+ "		<span style=\"color:#2B2B2B;font-size:14px;\">PDF版本见附件，请您查阅</span>" + "	</p>" + "</p>"
 			+ "<div id=\"signature\">" + "</div>";
 
-	public static void initSession() {
+	public static void sendEmail() {
+		Properties properties = IOUtil.loadPropertyFile("/email.properties");
 		// 配置对象
 		Properties props = new Properties();
 		// 邮件服务器
-		props.put("mail.host", "mail.x.xinhai.com");
+		props.put("mail.host", properties.getProperty("email.host"));
 		// 外网强制验证
 		props.setProperty("mail.smtp.auth", "true");
-		// 创建session对象
-		Session session = Session.getInstance(props, new Authenticator() {
+		// 创建session对象Authenticator
+		Authenticator authenticator = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("hgy@x.xinhai.com", "Xinhai0574");
+				return new PasswordAuthentication(properties.getProperty("email.Account"),
+						properties.getProperty("email.Password"));
 			}
-		});
-
-		MimeMessage message = new MimeMessage(session);
+		};
+		Session session = Session.getInstance(props, authenticator);
 		try {
+			String[] fileArr = getAttachments();
+			if (null == fileArr) {
+				return;
+			}
+			MimeMessage message = new MimeMessage(session);
 			// 设置发件人信息
-			message.setFrom(new InternetAddress("hgy@x.xinhai.com"));
+			message.setFrom(new InternetAddress(properties.getProperty("email.From")));
 			// 设置收件人
-			message.addRecipient(RecipientType.TO, new InternetAddress("ytianzhe@x.xinhai.com"));
+			message.addRecipient(RecipientType.TO, new InternetAddress(properties.getProperty("email.Recipient")));
 			// 设置主体
-			message.setSubject("超级好用的偷懒邮件工具");
+			message.setSubject(fileArr[1]);
 			// 设置内容
+			// multipart: mixed、alternative、related
 			MimeMultipart multipart = new MimeMultipart("mixed");
 			message.setContent(multipart);
 			MimeBodyPart content = new MimeBodyPart();
-			MimeBodyPart attch1 = new MimeBodyPart();
-
 			multipart.addBodyPart(content);
+
+			MimeBodyPart attch1 = new MimeBodyPart();
 			multipart.addBodyPart(attch1);
 
-			DataSource ds1 = new FileDataSource("E:\\pdfSender\\2018年8月开发组黄官易日报.pdf");
+			DataSource ds1 = new FileDataSource(fileArr[0]);
 			DataHandler dh1 = new DataHandler(ds1);
 			attch1.setDataHandler(dh1);
-			attch1.setFileName(MimeUtility.encodeText("2018年8月开发组黄官易日报"));
-
-			MimeMultipart bodyMultipart = new MimeMultipart("related");
-			content.setContent(bodyMultipart);
+			attch1.setFileName(MimeUtility.encodeText(fileArr[1]));
+			// }
 			// 构造正文
+			MimeMultipart bodyMultipart = new MimeMultipart("alternative");
+			content.setContent(bodyMultipart);
 			MimeBodyPart htmlBody = new MimeBodyPart();
 			bodyMultipart.addBodyPart(htmlBody);
 			htmlBody.setContent(str, "text/html;charset=UTF-8");
-
 			message.saveChanges();
 			// Transport对象
 			Transport.send(message);
-		} catch (AddressException e) {
+		} catch (
+
+		AddressException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MessagingException e) {
@@ -94,7 +108,25 @@ public class EmailUtil {
 	}
 
 	public static void main(String[] arg) {
-		EmailUtil.initSession();
+		EmailUtil.sendEmail();
 	}
 
+	public static String[] getAttachments() {
+		String[] fileArr = new String[2];
+		String path = EmailUtil.class.getResource("/").getPath();
+		try {
+			fileArr[0] = URLDecoder.decode(path + "../../upload/2018年" + DateUtil.getMonthNum() + "月"
+					+ DateUtil.getDayNumWithMonth() + "日开发组黄官易日报.pdf", "utf-8");
+			System.err.println(fileArr[0]);
+			File file = new File(fileArr[0]);
+			
+			if (file.exists()) {
+				fileArr[1] = file.getName();
+				return fileArr;
+			}
+		} catch (UnsupportedEncodingException e) {
+			log.error("未上传当天的日报 请及时上传");
+		}
+		return null;
+	}
 }
