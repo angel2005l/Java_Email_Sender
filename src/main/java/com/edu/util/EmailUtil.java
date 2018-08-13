@@ -10,11 +10,9 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Authenticator;
 import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -93,22 +91,10 @@ public class EmailUtil {
 			message.saveChanges();
 			// Transport对象
 			Transport.send(message);
-		} catch (
-
-		AddressException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.info("邮箱发送成功");
+		} catch (Exception e) {
+			log.error("邮箱发送异常,异常原因：【" + e.toString() + "】");
 		}
-	}
-
-	public static void main(String[] arg) {
-		EmailUtil.sendEmail();
 	}
 
 	public static String[] getAttachments() {
@@ -117,15 +103,15 @@ public class EmailUtil {
 		try {
 			fileArr[0] = URLDecoder.decode(path + "../../upload/2018年" + DateUtil.getMonthNum() + "月"
 					+ DateUtil.getDayNumWithMonth() + "日开发组黄官易日报.pdf", "utf-8");
-			System.err.println(fileArr[0]);
 			File file = new File(fileArr[0]);
-			
+
 			if (file.exists()) {
 				fileArr[1] = file.getName();
 				return fileArr;
 			}
+			log.error("文件不存在："+fileArr[0]);
 		} catch (UnsupportedEncodingException e) {
-			log.error("未上传当天的日报 请及时上传");
+			log.error("未上传当天的日报 请及时上传,补传日期：" + DateUtil.curDateYMD());
 		}
 		return null;
 	}

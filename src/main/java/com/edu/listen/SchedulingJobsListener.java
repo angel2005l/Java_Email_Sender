@@ -25,7 +25,7 @@ public class SchedulingJobsListener implements ServletContextListener {
 			// 默认30秒执行一次
 			Calendar calendar = Calendar.getInstance();
 
-			calendar.set(Calendar.HOUR_OF_DAY, 17);
+			calendar.set(Calendar.HOUR_OF_DAY, 13);
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
 

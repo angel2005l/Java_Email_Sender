@@ -5,13 +5,15 @@
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
+<title>日报上传</title>
 <base href="<%=basePath%>">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="assets/css/bootstrap.css" rel="stylesheet" media="screen">
 <link rel="stylesheet" href="assets/layui/css/layui.css">
+<link rel="stylesheet" href="assets/layer/theme/default/layer.css">
 <link rel="stylesheet" href="assets/plugins/weui/style/weui.css" />
 <link rel="stylesheet" href="assets/plugins/weui/style/example.css" />
 <link rel="stylesheet" href="assets/style/is.css" />
@@ -62,7 +64,7 @@
 	<div class="container" id="container" style="width: 500px;">
 		<div class="page js_show" id="request-proxy">
 			<div class="page__bd">
-				<form id="onloadForm" action="" method="post">
+				<form id="uploadForm" method="post" accept="multiple/form-data">
 					<div class="weui-cells weui-cells_form">
 						<div class="weui-cell">
 							<div class="weui-cell__bd  is-text-center">上传表单</div>
@@ -73,8 +75,7 @@
 								<label class="weui-label">文件</label>
 							</div>
 							<div class="weui-cell__bd">
-								<input type="file" id="file-input" name="fileContent"
-									class="weui-input" />
+								<input type="file" name="file" class="weui-input" />
 							</div>
 						</div>
 						<div class="weui-cell">
@@ -82,38 +83,66 @@
 								<label class="weui-label">日期</label>
 							</div>
 							<div class="weui-cell__bd">
-								<input type="text" name="date" id="date" lay-verify="date"
-									autocomplete="off" class="layui-input"
-									value="<%=new java.sql.Timestamp(System.currentTimeMillis()).toString().substring(0, 10)%>">
+								<input type="text" name="file_date" id="file_date"
+									class="layui-input layer-date">
 							</div>
 						</div>
 					</div>
 					<div class="weui-btn-area">
-						<button class="weui-btn weui-btn_primary confirm" type="button"
-							onclick="submit1()">上传</button>
+						<button class="weui-btn weui-btn_primary" type="button"
+							onclick="sumbitBtn()">上传</button>
 					</div>
 					<div class="weui-btn-area">
-						<button class="weui-btn weui-btn_primary confirm" type="button"
-							onclick="submit2()">人工发送</button>
+						<button class="weui-btn" type="button"
+							onclick="senderEmail()">人工发送</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 	<script type="text/javascript" src="assets/js/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="assets/layer/layer.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.form.js"></script>
 	<script type="text/javascript" src="assets/layui/layui.js"></script>
+	<script type="text/javascript" src="assets/layer/layer.js"></script>
 	<script>
-		layui.use([ 'laydate' ], function() {
+		layui.use('laydate', function() {
 			var laydate = layui.laydate;
-			//日期
 
 			laydate.render({
-				elem : '#date',
-				value : new Date()
+				elem : '#file_date',
+				type : 'date',
+				value : new Date(),
+				format : 'yyyy-M-d',
+				isInitValue : true
 			});
 
 		});
+		function sumbitBtn() {
+			$("#uploadForm").ajaxSubmit({
+				url : 'main.do?method=upload',
+				dataType : 'json',
+				success : function(result) {
+					layer.msg(result.msg);
+				},
+				error : function() {
+					layer.msg("服务器未响应");
+				}
+
+			})
+		}
+		function senderEmail() {
+			$.ajax({
+				url : 'main.do?method=sender',
+				type : 'get',
+				dataType : 'json',
+				success : function(result) {
+					layer.msg(result.msg);
+				},
+				error : function() {
+					layer.msg("服务器未响应");
+				}
+			})
+		}
 	</script>
 </body>
 </html>
