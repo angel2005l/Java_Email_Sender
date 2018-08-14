@@ -66,7 +66,7 @@ public class MainController extends HttpServlet {
 		try {
 			Map<String, Object> multipartData = IOUtil.getMultipartData(request);
 			// 获得文件保存路径
-			String path = this.getServletContext().getRealPath("/upload/");
+			String path = this.getServletContext().getRealPath("");
 
 			// 获得文件流
 			List<InputStream> list = (List<InputStream>) multipartData.get("stream");
@@ -78,8 +78,8 @@ public class MainController extends HttpServlet {
 
 			// 获得文件名称
 			String fileName = dateStr[0] + "年" + dateStr[1] + "月" + dateStr[2] + "日开发组黄官易日报.pdf";
-
-			File file = new File(path + fileName);
+			String pathFile = path + "../upload/" + fileName;
+			File file = new File(pathFile);
 			if (file.exists()) {
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("code", "400");
@@ -94,7 +94,7 @@ public class MainController extends HttpServlet {
 			} else {
 				InputStream in = list.get(0);
 
-				FileOutputStream out = new FileOutputStream(path + fileName);
+				FileOutputStream out = new FileOutputStream(pathFile);
 				// 创建一个缓冲区
 				byte buffer[] = new byte[5120];
 				// 判断输入流中的数据是否已经读完的标识

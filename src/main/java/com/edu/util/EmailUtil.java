@@ -101,7 +101,7 @@ public class EmailUtil {
 		String[] fileArr = new String[2];
 		String path = EmailUtil.class.getResource("/").getPath();
 		try {
-			fileArr[0] = URLDecoder.decode(path + "../../upload/2018年" + DateUtil.getMonthNum() + "月"
+			fileArr[0] = URLDecoder.decode(path + "../../../upload/2018年" + DateUtil.getMonthNum() + "月"
 					+ DateUtil.getDayNumWithMonth() + "日开发组黄官易日报.pdf", "utf-8");
 			File file = new File(fileArr[0]);
 

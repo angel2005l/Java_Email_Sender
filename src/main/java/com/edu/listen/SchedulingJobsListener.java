@@ -25,15 +25,18 @@ public class SchedulingJobsListener implements ServletContextListener {
 			// 默认30秒执行一次
 			Calendar calendar = Calendar.getInstance();
 
-			calendar.set(Calendar.HOUR_OF_DAY, 13);
-			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.HOUR_OF_DAY, 12);
+			calendar.set(Calendar.MINUTE, 30);
 			calendar.set(Calendar.SECOND, 0);
 
 			Date time = calendar.getTime();
 
+			if (time.before(new Date())) {
+				time = this.addDay(time, 1);
+			}
 			timer.schedule(new Task(), time, 24 * 60 * 60 * 1000);
 		} catch (Exception e) {
-			 log.error("调度任务监听类异常,异常原因:" + e.toString());
+			log.error("调度任务监听类异常,异常原因:" + e.toString());
 		}
 	}
 
@@ -41,6 +44,13 @@ public class SchedulingJobsListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		sce.getServletContext().log("【销毁----调度任务】");
 		timer.cancel();
+	}
+
+	private Date addDay(Date date, int day) {
+		Calendar instance = Calendar.getInstance();
+		instance.setTime(date);
+		instance.add(Calendar.DAY_OF_MONTH, day);
+		return instance.getTime();
 	}
 
 }
