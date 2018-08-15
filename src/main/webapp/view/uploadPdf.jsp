@@ -12,10 +12,10 @@
 <base href="<%=basePath%>">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="assets/css/bootstrap.css" rel="stylesheet" media="screen">
-<link rel="stylesheet" href="assets/layui/css/layui.css">
 <link rel="stylesheet" href="assets/layer/theme/default/layer.css">
 <link rel="stylesheet" href="assets/plugins/weui/style/weui.css" />
 <link rel="stylesheet" href="assets/plugins/weui/style/example.css" />
+<link rel="stylesheet" href="assets/layui/css/layui.css">
 <link rel="stylesheet" href="assets/style/is.css" />
 <style>
 #request-proxy .dialog-img-code .weui-cell {
@@ -102,8 +102,8 @@
 	</div>
 	<script type="text/javascript" src="assets/js/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="assets/js/jquery.form.js"></script>
-	<script type="text/javascript" src="assets/layui/layui.js"></script>
 	<script type="text/javascript" src="assets/layer/layer.js"></script>
+	<script type="text/javascript" src="assets/layui/layui.js"></script>
 	<script>
 		layui.use('laydate', function() {
 			var laydate = layui.laydate;
